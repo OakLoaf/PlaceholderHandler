@@ -1,4 +1,4 @@
-name: ProjectName
+name: PlaceholderHandler
 version: ${project.version}
-main: org.lushplugins.projectname.ProjectName
+main: org.lushplugins.placeholderhandler.PlaceholderHandler
 api-version: '1.17'
