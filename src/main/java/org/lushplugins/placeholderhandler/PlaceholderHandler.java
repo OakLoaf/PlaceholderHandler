@@ -1,26 +1,99 @@
 package org.lushplugins.placeholderhandler;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Nullable;
+import org.lushplugins.placeholderhandler.parameter.ParameterProvider;
+import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
+import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
+import org.lushplugins.placeholderhandler.stream.StringStream;
 
-public final class PlaceholderHandler extends JavaPlugin {
-    private static PlaceholderHandler plugin;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    @Override
-    public void onLoad() {
-        plugin = this;
+public final class PlaceholderHandler {
+    private final JavaPlugin plugin;
+    private final List<PlaceholderImpl> placeholders = new ArrayList<>();
+    private final Map<Class<?>, ParameterProvider<?>> parameterProviders;
+    private final Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories;
+
+    public PlaceholderHandler(
+        JavaPlugin plugin,
+        Map<Class<?>, ParameterProvider<?>> parameterProviders,
+        Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories
+    ) {
+        this.plugin = plugin;
+        this.parameterProviders = parameterProviders;
+        this.parameterProviderFactories = parameterProviderFactories;
     }
 
-    @Override
-    public void onEnable() {
-        // Enable implementation
-    }
-
-    @Override
-    public void onDisable() {
-        // Disable implementation
-    }
-
-    public static PlaceholderHandler getInstance() {
+    public JavaPlugin getPlugin() {
         return plugin;
+    }
+
+    public void register(PlaceholderImpl placeholder) {
+        this.placeholders.add(placeholder);
+    }
+
+    /**
+     * @param rawPlaceholder rawPlaceholder in format '%placeholder_params%'
+     * @param player the player to parse the rawPlaceholder for
+     * @return the result of the parsed rawPlaceholder
+     */
+    public String parsePlaceholder(String rawPlaceholder, @Nullable Player player) {
+        StringStream input = StringStream.create(rawPlaceholder
+            .substring(1, rawPlaceholder.length() - 1));
+
+        String identifier = input.peekUnquotedString();
+        for (PlaceholderImpl placeholder : this.placeholders) {
+            if (!placeholder.firstNode().name().equals(identifier)) {
+                continue;
+            }
+
+            // TODO: Implement code to work out which placeholder to use
+        }
+
+        PlaceholderImpl placeholder = null; // TODO
+        return placeholder.parse(new PlaceholderContext(input, player, this));
+    }
+
+    public ParameterProvider<?> getParameterProvider(Class<?> type) {
+        return this.parameterProviders.get(type);
+    }
+
+    public ParameterProvider.Factory getParameterProviderFactory(Class<?> type) {
+        return this.parameterProviderFactories.get(type);
+    }
+
+    public static Builder builder(JavaPlugin plugin) {
+        return new Builder(plugin);
+    }
+
+    public static class Builder {
+        private final JavaPlugin plugin;
+        private final Map<Class<?>, ParameterProvider<?>> parameterProviders = new HashMap<>(Map.ofEntries(
+            ParameterProvider.Factory.forType(Player.class, (type, context) -> context.player())
+        ));
+        private final Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories = new HashMap<>();
+
+        private Builder(JavaPlugin plugin) {
+            this.plugin = plugin;
+        }
+
+        public <T> Builder registerParameterProvider(Class<T> type, ParameterProvider<T> provider) {
+            this.parameterProviders.put(type, provider);
+            return this;
+        }
+
+        public Builder registerParameterProviderFactory(Class<?> type, ParameterProvider.Factory provider) {
+            this.parameterProviderFactories.put(type, provider);
+            return this;
+        }
+
+        public PlaceholderHandler build() {
+            return new PlaceholderHandler(this.plugin, this.parameterProviders, this.parameterProviderFactories);
+        }
     }
 }
