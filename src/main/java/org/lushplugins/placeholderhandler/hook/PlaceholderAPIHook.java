@@ -5,18 +5,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.lushplugins.placeholderhandler.PlaceholderHandler;
 
-import java.util.Collections;
-import java.util.List;
-
 public class PlaceholderAPIHook {
 
-    public PlaceholderAPIHook(PlaceholderHandler instance) {
-        // TODO: Register expansion for each identifier
-        List<String> identifiers = Collections.emptyList();
-        for (String identifier : identifiers) {
-            new Expansion(instance, identifier)
-                .register();
-        }
+    public static void register(PlaceholderHandler instance) {
+        instance.placeholders().stream()
+            .map(p -> p.firstNode().name())
+            .distinct()
+            .forEach((identifier) -> new Expansion(instance, identifier)
+                .register());
     }
 
     public static class Expansion extends PlaceholderExpansion {
@@ -45,11 +41,11 @@ public class PlaceholderAPIHook {
         }
 
         public @NotNull String getAuthor() {
-            return String.join(", ", this.instance.getPlugin().getDescription().getAuthors());
+            return String.join(", ", this.instance.plugin().getDescription().getAuthors());
         }
 
         public @NotNull String getVersion() {
-            return this.instance.getPlugin().getDescription().getVersion();
+            return this.instance.plugin().getDescription().getVersion();
         }
     }
 }

@@ -4,11 +4,11 @@ import org.lushplugins.placeholderhandler.parameter.ParameterProvider;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
 
 public class ParameterNode<T> extends PlaceholderNode {
-    private final Class<T> type;
+    private final Class<?> type;
     private final ParameterProvider<T> provider;
 
     public ParameterNode(
-        Class<T> type,
+        Class<?> type,
         ParameterProvider<T> provider
     ) {
         super(1);
@@ -18,6 +18,6 @@ public class ParameterNode<T> extends PlaceholderNode {
 
     @Override
     public boolean test(String parameter, PlaceholderContext context) {
-        return this.provider.collect(this.type, context) != null;
+        return this.provider.collect((Class<T>) this.type, parameter, context) != null;
     }
 }

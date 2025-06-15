@@ -23,14 +23,12 @@ public class PlaceholderImpl {
         return nodes;
     }
 
-    public String parse(PlaceholderContext context) {
-        return this.parser.parse(context);
+    public String parse(MutableStringStream input, PlaceholderContext context) {
+        return this.parser.parse(input, context);
     }
 
-    public boolean isValid(PlaceholderContext context) {
-        MutableStringStream input = context.input().toMutableCopy();
-
-        for (PlaceholderNode node : nodes) {
+    public boolean isValid(MutableStringStream input, PlaceholderContext context) {
+        for (PlaceholderNode node : this.nodes) {
             String parameter = input.readString();
             if (!node.test(parameter, context)) {
                 return false;

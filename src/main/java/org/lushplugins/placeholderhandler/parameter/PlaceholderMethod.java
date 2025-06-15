@@ -2,6 +2,7 @@ package org.lushplugins.placeholderhandler.parameter;
 
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderParser;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
+import org.lushplugins.placeholderhandler.stream.MutableStringStream;
 import org.lushplugins.placeholderhandler.util.reflect.MethodCaller;
 
 import java.util.Map;
@@ -19,9 +20,9 @@ public class PlaceholderMethod implements PlaceholderParser {
     }
 
     @Override
-    public String parse(PlaceholderContext context) {
+    public String parse(MutableStringStream input, PlaceholderContext context) {
         Object[] arguments = this.parameterProviders.values().stream()
-            .map(provider -> provider.asObject(context))
+            .map(provider -> provider.asObject(input, context))
             .toArray();
 
         return (String) this.caller.call(arguments);

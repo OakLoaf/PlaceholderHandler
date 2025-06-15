@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Placeholder {
     /**
-     * The input identifier and aliases. Values can contain spaces,
-     * in which case it would automatically walk through the categories and
-     * correctly calculate the command path.
+     * The input path and aliases. Values can contain underscores,
+     * but not spaces.
+     * <p>
+     * Parameter placeholders in the format {@code <parameter>} are
+     * only supported on methods.
      *
      * @return The input identifier and aliases
      */
