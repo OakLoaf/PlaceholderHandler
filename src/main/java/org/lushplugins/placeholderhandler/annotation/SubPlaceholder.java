@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SubPlaceholder {
     /**
-     * The rawPlaceholder path and aliases. Values can contain spaces,
+     * The input path and aliases. Values can contain spaces,
      * in which case it would automatically walk through the categories and
      * correctly calculate the command path.
      *
-     * @return The rawPlaceholder path and aliases
+     * @return The input path and aliases
      */
     String[] value();
 }

@@ -25,8 +25,8 @@
 package org.lushplugins.placeholderhandler.util.reflect;
 
 import org.jetbrains.annotations.NotNull;
-import org.lushplugins.guihandler.util.reflect.ktx.KotlinConstants;
-import org.lushplugins.guihandler.util.reflect.ktx.KotlinFunction;
+import org.lushplugins.placeholderhandler.util.reflect.ktx.KotlinConstants;
+import org.lushplugins.placeholderhandler.util.reflect.ktx.KotlinFunction;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

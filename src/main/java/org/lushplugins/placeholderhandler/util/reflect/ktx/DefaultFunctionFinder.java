@@ -26,8 +26,8 @@ package org.lushplugins.placeholderhandler.util.reflect.ktx;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lushplugins.guihandler.util.Collections;
-import org.lushplugins.guihandler.util.reflect.MethodCaller;
+import org.lushplugins.placeholderhandler.util.Collections;
+import org.lushplugins.placeholderhandler.util.reflect.MethodCaller;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

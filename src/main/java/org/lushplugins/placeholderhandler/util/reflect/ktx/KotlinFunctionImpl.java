@@ -27,13 +27,15 @@ package org.lushplugins.placeholderhandler.util.reflect.ktx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
-import org.lushplugins.guihandler.util.Lazy;
-import org.lushplugins.guihandler.util.reflect.MethodCaller;
+import org.lushplugins.placeholderhandler.util.Collections;
+import org.lushplugins.placeholderhandler.util.Lazy;
+import org.lushplugins.placeholderhandler.util.reflect.MethodCaller;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;

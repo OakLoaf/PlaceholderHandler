@@ -27,7 +27,7 @@ package org.lushplugins.placeholderhandler.util.reflect.ktx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
-import org.lushplugins.guihandler.util.Preconditions;
+import org.lushplugins.placeholderhandler.util.Preconditions;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

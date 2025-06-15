@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Placeholder {
     /**
-     * The rawPlaceholder identifier and aliases. Values can contain spaces,
+     * The input identifier and aliases. Values can contain spaces,
      * in which case it would automatically walk through the categories and
      * correctly calculate the command path.
      *
-     * @return The rawPlaceholder identifier and aliases
+     * @return The input identifier and aliases
      */
     String[] value();
 }

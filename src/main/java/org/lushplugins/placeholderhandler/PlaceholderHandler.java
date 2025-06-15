@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lushplugins.placeholderhandler.parameter.ParameterProvider;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
+import org.lushplugins.placeholderhandler.stream.MutableStringStream;
 import org.lushplugins.placeholderhandler.stream.StringStream;
 
 import java.util.ArrayList;
@@ -38,13 +39,15 @@ public final class PlaceholderHandler {
     }
 
     /**
-     * @param rawPlaceholder rawPlaceholder in format '%placeholder_params%'
-     * @param player the player to parse the rawPlaceholder for
-     * @return the result of the parsed rawPlaceholder
+     * @param rawPlaceholder input in format '%placeholder_params%'
+     * @param player the player to parse the input for
+     * @return the result of the parsed input
      */
-    public String parsePlaceholder(String rawPlaceholder, @Nullable Player player) {
-        StringStream input = StringStream.create(rawPlaceholder
-            .substring(1, rawPlaceholder.length() - 1));
+    public @Nullable String parsePlaceholder(String rawPlaceholder, @Nullable Player player) {
+        MutableStringStream input = StringStream.create(rawPlaceholder
+            .substring(1, rawPlaceholder.length() - 1))
+            .toMutableCopy();
+        PlaceholderContext context = new PlaceholderContext(input, player, this);
 
         String identifier = input.peekUnquotedString();
         for (PlaceholderImpl placeholder : this.placeholders) {
@@ -52,11 +55,12 @@ public final class PlaceholderHandler {
                 continue;
             }
 
-            // TODO: Implement code to work out which placeholder to use
+            if (placeholder.isValid(context)) {
+                return placeholder.parse(context);
+            }
         }
 
-        PlaceholderImpl placeholder = null; // TODO
-        return placeholder.parse(new PlaceholderContext(input, player, this));
+        return null;
     }
 
     public ParameterProvider<?> getParameterProvider(Class<?> type) {
