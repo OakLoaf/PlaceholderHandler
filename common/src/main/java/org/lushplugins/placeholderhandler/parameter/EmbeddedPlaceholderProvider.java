@@ -16,7 +16,7 @@ public class EmbeddedPlaceholderProvider implements ParameterProvider.Factory {
 
         @Override
         public String collect(Class<String> typeClass, String parameter, PlaceholderContext context) {
-            return context.instance().parsePlaceholder(parameter, context.player());
+            return context.instance().parsePlaceholder(parameter);
         }
     }
 }
