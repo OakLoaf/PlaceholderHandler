@@ -4,15 +4,25 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.lushplugins.placeholderhandler.PlaceholderHandler;
+import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
 
-public class PlaceholderAPIHook {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-    public static void register(PlaceholderHandler instance) {
-        instance.placeholders().stream()
-            .map(p -> p.firstNode().name())
+public class PlaceholderAPIHook implements PlaceholderHook {
+    private final List<String> registeredIdentifiers = new ArrayList<>();
+
+    @Override
+    public void register(PlaceholderHandler instance, Collection<PlaceholderImpl> placeholders) {
+        placeholders.stream()
+            .map(placeholder -> placeholder.firstNode().name())
             .distinct()
-            .forEach((identifier) -> new Expansion(instance, identifier)
-                .register());
+            .filter(identifier -> !registeredIdentifiers.contains(identifier))
+            .forEach((identifier) -> {
+                new Expansion(instance, identifier).register();
+                registeredIdentifiers.add(identifier);
+            });
     }
 
     public static class Expansion extends PlaceholderExpansion {

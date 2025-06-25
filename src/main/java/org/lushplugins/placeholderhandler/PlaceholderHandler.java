@@ -1,10 +1,10 @@
 package org.lushplugins.placeholderhandler;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 import org.lushplugins.placeholderhandler.annotation.AnnotationHandler;
+import org.lushplugins.placeholderhandler.hook.HookRegistry;
 import org.lushplugins.placeholderhandler.hook.PlaceholderAPIHook;
 import org.lushplugins.placeholderhandler.parameter.EmbeddedPlaceholderProvider;
 import org.lushplugins.placeholderhandler.parameter.ParameterProvider;
@@ -22,7 +22,9 @@ public final class PlaceholderHandler {
     private final List<PlaceholderImpl> placeholders = new ArrayList<>();
     private final Map<Class<?>, ParameterProvider<?>> parameterProviders;
     private final Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories;
+    private final HookRegistry hooks = new HookRegistry();
 
+    @SuppressWarnings("Convert2MethodRef")
     public PlaceholderHandler(
         JavaPlugin plugin,
         Map<Class<?>, ParameterProvider<?>> parameterProviders,
@@ -32,10 +34,7 @@ public final class PlaceholderHandler {
         this.parameterProviders = parameterProviders;
         this.parameterProviderFactories = parameterProviderFactories;
 
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
-        if (pluginManager.isPluginEnabled("PlaceholderAPI")) {
-            PlaceholderAPIHook.register(this);
-        }
+        this.hooks.register("PlaceholderAPI", () -> new PlaceholderAPIHook());
     }
 
     public JavaPlugin plugin() {
@@ -49,11 +48,13 @@ public final class PlaceholderHandler {
     public void register(Object instance) {
         if (instance instanceof PlaceholderImpl placeholder) {
             this.placeholders.add(placeholder);
+            this.hooks.registerPlaceholder(this, placeholder);
             return;
         }
 
         List<PlaceholderImpl> placeholders = AnnotationHandler.register(instance.getClass(), instance, this);
         this.placeholders.addAll(placeholders);
+        this.hooks.registerPlaceholders(this, placeholders);
     }
 
     public void register(String rawPlaceholder, PlaceholderParser placeholder) {
