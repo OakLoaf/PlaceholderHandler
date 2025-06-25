@@ -35,7 +35,8 @@ public class PlaceholderAPIHook implements PlaceholderHook {
         }
 
         public String onPlaceholderRequest(Player player, @NotNull String params) {
-            return this.instance.parsePlaceholder(params, player);
+            String placeholder = "%" + identifier + "_" + params + "%";
+            return this.instance.parsePlaceholder(placeholder, player);
         }
 
         public boolean persist() {
