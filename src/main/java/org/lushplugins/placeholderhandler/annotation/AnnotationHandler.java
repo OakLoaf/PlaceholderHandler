@@ -54,24 +54,25 @@ public class AnnotationHandler {
             Map<String, PlaceholderParameter<?>> parameters = new LinkedHashMap<>();
             for (Parameter parameter : method.getParameters()) {
                 String name = parameter.getName();
+                Class<?> parameterClass = parameter.getType();
 
                 ParameterProvider<?> provider = null;
-                ParameterProvider.Factory providerFactory = placeholderHandler.getParameterProviderFactory(instanceClass);
+                ParameterProvider.Factory providerFactory = placeholderHandler.getParameterProviderFactory(parameterClass);
                 if (providerFactory != null) {
                     AnnotationList parameterAnnotations = new AnnotationList(parameter);
-                    provider = providerFactory.create(instanceClass, parameterAnnotations, placeholderHandler);
+                    provider = providerFactory.create(parameterClass, parameterAnnotations, placeholderHandler);
                 }
 
                 if (provider == null) {
-                    provider = placeholderHandler.getParameterProvider(instanceClass);
+                    provider = placeholderHandler.getParameterProvider(parameterClass);
                 }
 
                 if (provider == null) {
                     throw new IllegalArgumentException("Invalid parameter type '%s' defined at method '%s' with parameter name '%s'"
-                        .formatted(instanceClass.getSimpleName(), method.getName(), name));
+                        .formatted(parameterClass.getSimpleName(), method.getName(), name));
                 }
 
-                parameters.put(name, new PlaceholderParameter<>(name, parameter.getType(), provider));
+                parameters.put(name, new PlaceholderParameter<>(name, parameterClass, provider));
             }
 
             PlaceholderMethod placeholderMethod = new PlaceholderMethod(caller, parameters);
