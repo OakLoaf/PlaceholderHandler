@@ -67,8 +67,8 @@ public class AnnotationHandler {
                 }
 
                 if (provider == null) {
-                    throw new IllegalArgumentException("Invalid parameter type defined at method '%s' with parameter name '%s'"
-                        .formatted(method.getName(), name));
+                    throw new IllegalArgumentException("Invalid parameter type '%s' defined at method '%s' with parameter name '%s'"
+                        .formatted(instanceClass.getSimpleName(), method.getName(), name));
                 }
 
                 parameters.put(name, new PlaceholderParameter<>(name, parameter.getType(), provider));
