@@ -6,22 +6,21 @@ import org.jetbrains.annotations.NotNull;
 import org.lushplugins.placeholderhandler.PlaceholderHandler;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class PlaceholderAPIHook implements PlaceholderHook {
-    private final List<String> registeredIdentifiers = new ArrayList<>();
+    private final Map<String, Expansion> expansions = new HashMap<>();
 
     @Override
     public void register(PlaceholderHandler instance, Collection<PlaceholderImpl> placeholders) {
         placeholders.stream()
             .map(placeholder -> placeholder.firstNode().name())
             .distinct()
-            .filter(identifier -> !registeredIdentifiers.contains(identifier))
+            .filter(identifier -> !this.expansions.containsKey(identifier))
             .forEach((identifier) -> {
-                new Expansion(instance, identifier).register();
-                registeredIdentifiers.add(identifier);
+                Expansion expansion = new Expansion(instance, identifier);
+                expansion.register();
+                this.expansions.put(identifier, expansion);
             });
     }
 
