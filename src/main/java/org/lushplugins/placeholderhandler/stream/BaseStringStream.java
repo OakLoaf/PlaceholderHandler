@@ -132,8 +132,14 @@ class BaseStringStream implements StringStream {
     }
 
     public @NotNull String readString() {
-        if (!hasRemaining())
+        if (!hasRemaining()) {
             return "";
+        }
+
+        if (isSeparator(peek())) {
+            pos += 1;
+        }
+
         char next = peek();
         if (next == DOUBLE_QUOTE) {
             pos += 1;
