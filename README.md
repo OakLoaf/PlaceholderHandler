@@ -65,6 +65,11 @@ public class ExamplePlaceholders {
         return player != null ? player.getUniqueId().toString() : null;
     }
 
+    @SubPlaceholder("<rawString>_upper_case") // Will register as "%example_<rawString>_upper_case%, where `<rawString>` is passed as the parameter in the method"
+    public void name(String rawString) {
+        return rawString.toUpperCase();
+    }
+
     @Placeholder("different_hello") // Will register as "%different_hello%"
     public String hello() {
         return "Hello World!";
