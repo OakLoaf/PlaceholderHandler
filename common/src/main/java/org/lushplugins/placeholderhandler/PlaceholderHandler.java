@@ -95,11 +95,12 @@ public final class PlaceholderHandler {
 
     public static Builder builder() {
         return new Builder()
-            .registerParameterProviderFactory(String.class, new EmbeddedPlaceholderProvider());
+            .registerParameterProviderFactory(String.class, new EmbeddedPlaceholderProvider())
+            .registerParameterProvider(String.class, (type, parameter, context) -> parameter);
     }
 
     public static class Builder {
-        private final Map<Class<?>, ParameterProvider.Factory> parameterProviders = new HashMap<>();
+        private final Map<Class<?>, ParameterProvider.Factory> parameterProviders = new LinkedHashMap<>();
         private final List<PlaceholderHook> hooks = new ArrayList<>();
 
         private Builder() {}
