@@ -37,7 +37,8 @@ final class KotlinMethodCallerFactory implements MethodCallerFactory {
 
     public static final KotlinMethodCallerFactory INSTANCE = new KotlinMethodCallerFactory();
 
-    @Override public @NotNull MethodCaller createFor(@NotNull Method method) {
+    @Override
+    public @NotNull MethodCaller createFor(@NotNull Method method) {
         KotlinFunction function = KotlinFunction.wrap(method);
         return (instance, arguments) -> {
             List<Object> list = new ArrayList<>();

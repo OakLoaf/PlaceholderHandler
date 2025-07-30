@@ -57,14 +57,10 @@ public class AnnotationHandler {
                 Class<?> parameterClass = parameter.getType();
 
                 ParameterProvider<?> provider = null;
-                ParameterProvider.Factory providerFactory = placeholderHandler.getParameterProviderFactory(parameterClass);
+                ParameterProvider.Factory providerFactory = placeholderHandler.getParameterProvider(parameterClass);
                 if (providerFactory != null) {
                     AnnotationList parameterAnnotations = new AnnotationList(parameter);
                     provider = providerFactory.create(parameterClass, parameterAnnotations, placeholderHandler);
-                }
-
-                if (provider == null) {
-                    provider = placeholderHandler.getParameterProvider(parameterClass);
                 }
 
                 if (provider == null) {
