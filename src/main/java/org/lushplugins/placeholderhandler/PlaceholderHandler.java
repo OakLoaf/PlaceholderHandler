@@ -106,6 +106,7 @@ public final class PlaceholderHandler {
     public static class Builder {
         private final JavaPlugin plugin;
         private final Map<Class<?>, ParameterProvider<?>> parameterProviders = new HashMap<>(Map.ofEntries(
+            ParameterProvider.forType(String.class, (type, parameter, context) -> parameter),
             ParameterProvider.forType(Player.class, (type, parameter, context) -> context.player())
         ));
         private final Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories = new HashMap<>(Map.ofEntries(
