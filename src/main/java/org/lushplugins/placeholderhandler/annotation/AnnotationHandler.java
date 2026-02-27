@@ -75,7 +75,7 @@ public class AnnotationHandler {
                 parameters.put(name, new PlaceholderParameter<>(name, parameterClass, provider));
             }
 
-            PlaceholderMethod placeholderMethod = new PlaceholderMethod(caller, parameters.keySet());
+            PlaceholderMethod placeholderMethod = new PlaceholderMethod(caller, parameters);
 
             if (annotations.contains(Placeholder.class)) {
                 Placeholder methodAnnotation = annotations.get(Placeholder.class);
