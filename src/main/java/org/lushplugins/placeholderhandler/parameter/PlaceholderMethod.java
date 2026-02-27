@@ -10,29 +10,34 @@ import org.lushplugins.placeholderhandler.util.reflect.MethodCaller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class PlaceholderMethod implements PlaceholderParser {
     private final MethodCaller.BoundMethodCaller caller;
-    private final Set<String> parameters;
+    private final Map<String, PlaceholderParameter<?>> parameters;
 
-    public PlaceholderMethod(MethodCaller.BoundMethodCaller caller, Set<String> parameters) {
+    public PlaceholderMethod(MethodCaller.BoundMethodCaller caller, Map<String, PlaceholderParameter<?>> parameters) {
         this.caller = caller;
         this.parameters = parameters;
     }
 
     @Override
     public String parse(MutableStringStream input, PlaceholderImpl placeholder, PlaceholderContext context) {
-        Map<String, Object> arguments = new HashMap<>();
+        Map<String, Object> parameterArguments = new HashMap<>();
         for (PlaceholderNode node : placeholder.nodes()) {
             String parameter = input.readString();
             if (node instanceof ParameterNode<?> parameterNode) {
-                arguments.put(parameterNode.parameterName(), parameterNode.parse(parameter, context));
+                parameterArguments.put(parameterNode.parameterName(), parameterNode.parse(parameter, context));
             }
         }
 
-        Object[] orderedArgs = this.parameters.stream()
-            .map(arguments::get)
+        Object[] orderedArgs = this.parameters.keySet().stream()
+            .map(parameterName -> {
+                if (parameterArguments.containsKey(parameterName)) {
+                    return parameterArguments.get(parameterName);
+                } else {
+                    return this.parameters.get(parameterName);
+                }
+            })
             .toArray();
 
         return (String) this.caller.call(orderedArgs);
