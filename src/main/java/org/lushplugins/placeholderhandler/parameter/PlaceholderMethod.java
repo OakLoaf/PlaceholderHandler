@@ -35,7 +35,7 @@ public class PlaceholderMethod implements PlaceholderParser {
                 if (parameterArguments.containsKey(parameterName)) {
                     return parameterArguments.get(parameterName);
                 } else {
-                    return this.parameters.get(parameterName);
+                    return this.parameters.get(parameterName).asObject(input, context);
                 }
             })
             .toArray();
