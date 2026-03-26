@@ -11,21 +11,24 @@ import org.lushplugins.placeholderhandler.util.reflect.MethodCaller;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlaceholderMethod implements PlaceholderParser {
+public class PlaceholderMethod<C extends PlaceholderContext> implements PlaceholderParser<C> {
     private final MethodCaller.BoundMethodCaller caller;
-    private final Map<String, PlaceholderParameter<?>> parameters;
+    private final Map<String, PlaceholderParameter<?, C>> parameters;
 
-    public PlaceholderMethod(MethodCaller.BoundMethodCaller caller, Map<String, PlaceholderParameter<?>> parameters) {
+    public PlaceholderMethod(
+        MethodCaller.BoundMethodCaller caller,
+        Map<String, PlaceholderParameter<?, C>> parameters
+    ) {
         this.caller = caller;
         this.parameters = parameters;
     }
 
     @Override
-    public String parse(MutableStringStream input, PlaceholderImpl placeholder, PlaceholderContext context) {
+    public String parse(MutableStringStream input, PlaceholderImpl<C> placeholder, C context) {
         Map<String, Object> parameterArguments = new HashMap<>();
-        for (PlaceholderNode node : placeholder.nodes()) {
+        for (PlaceholderNode<C> node : placeholder.nodes()) {
             String parameter = input.readString();
-            if (node instanceof ParameterNode<?> parameterNode) {
+            if (node instanceof ParameterNode parameterNode) {
                 parameterArguments.put(parameterNode.parameterName(), parameterNode.parse(parameter, context));
             }
         }

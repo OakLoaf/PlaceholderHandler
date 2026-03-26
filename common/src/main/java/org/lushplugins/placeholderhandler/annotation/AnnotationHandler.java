@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lushplugins.placeholderhandler.parameter.ParameterProvider;
 import org.lushplugins.placeholderhandler.parameter.PlaceholderMethod;
 import org.lushplugins.placeholderhandler.parameter.PlaceholderParameter;
+import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
 import org.lushplugins.placeholderhandler.placeholder.node.LiteralNode;
 import org.lushplugins.placeholderhandler.placeholder.node.PlaceholderNode;
@@ -18,20 +19,20 @@ import java.util.*;
 
 public class AnnotationHandler {
 
-    public static List<PlaceholderImpl> register(@NotNull Class<?> instanceClass, Object instance, PlaceholderHandler placeholderHandler) {
-        List<List<PlaceholderNode>> baseNodes;
+    public static <C extends PlaceholderContext> List<PlaceholderImpl<C>> register(@NotNull Class<?> instanceClass, Object instance, PlaceholderHandler<C> placeholderHandler) {
+        List<List<PlaceholderNode<C>>> baseNodes;
         Placeholder baseAnnotation = instanceClass.getAnnotation(Placeholder.class);
         if (baseAnnotation != null) {
             baseNodes = Arrays.stream(baseAnnotation.value())
                 .map(path -> Arrays.stream(path.split("_"))
-                    .map(parameter -> (PlaceholderNode) new LiteralNode(parameter))
+                    .<PlaceholderNode<C>>map(LiteralNode::new)
                     .toList())
                 .toList();
         } else {
             baseNodes = Collections.emptyList();
         }
 
-        List<PlaceholderImpl> placeholders = new ArrayList<>();
+        List<PlaceholderImpl<C>> placeholders = new ArrayList<>();
         for (Method method : Reflection.getAllMethods(instanceClass)) {
             AnnotationList annotations = new AnnotationList(method);
             if (annotations.isEmpty()) {
@@ -51,13 +52,13 @@ public class AnnotationHandler {
                 throw new RuntimeException(e);
             }
 
-            Map<String, PlaceholderParameter<?>> parameters = new LinkedHashMap<>();
+            Map<String, PlaceholderParameter<?, C>> parameters = new LinkedHashMap<>();
             for (Parameter parameter : method.getParameters()) {
                 String name = parameter.getName();
                 Class<?> parameterClass = parameter.getType();
 
-                ParameterProvider<?> provider = null;
-                ParameterProvider.Factory providerFactory = placeholderHandler.getParameterProvider(parameterClass);
+                ParameterProvider<?, C> provider = null;
+                ParameterProvider.Factory<C> providerFactory = placeholderHandler.getParameterProvider(parameterClass);
                 if (providerFactory != null) {
                     AnnotationList parameterAnnotations = new AnnotationList(parameter);
                     provider = providerFactory.create(parameterClass, parameterAnnotations, placeholderHandler);
@@ -71,26 +72,26 @@ public class AnnotationHandler {
                 parameters.put(name, new PlaceholderParameter<>(name, parameterClass, provider));
             }
 
-            PlaceholderMethod placeholderMethod = new PlaceholderMethod(caller, parameters);
+            PlaceholderMethod<C> placeholderMethod = new PlaceholderMethod<>(caller, parameters);
 
             if (annotations.contains(Placeholder.class)) {
                 Placeholder methodAnnotation = annotations.get(Placeholder.class);
                 for (String path : methodAnnotation.value()) {
-                    List<PlaceholderNode> nodes = PlaceholderNode.create(path, parameters);
-                    placeholders.add(new PlaceholderImpl(nodes, placeholderMethod));
+                    List<PlaceholderNode<C>> nodes = PlaceholderNode.create(path, parameters);
+                    placeholders.add(new PlaceholderImpl<>(nodes, placeholderMethod));
                 }
             }
 
             if (annotations.contains(SubPlaceholder.class)) {
                 SubPlaceholder methodAnnotation = annotations.get(SubPlaceholder.class);
                 for (String path : methodAnnotation.value()) {
-                    List<PlaceholderNode> additionalNodes = PlaceholderNode.create(path, parameters);
+                    List<PlaceholderNode<C>> additionalNodes = PlaceholderNode.create(path, parameters);
 
-                    for (List<PlaceholderNode> baseNode : baseNodes) {
-                        List<PlaceholderNode> nodes = new ArrayList<>(baseNode);
+                    for (List<PlaceholderNode<C>> baseNode : baseNodes) {
+                        List<PlaceholderNode<C>> nodes = new ArrayList<>(baseNode);
                         nodes.addAll(additionalNodes);
 
-                        placeholders.add(new PlaceholderImpl(nodes, placeholderMethod));
+                        placeholders.add(new PlaceholderImpl<>(nodes, placeholderMethod));
                     }
                 }
             }

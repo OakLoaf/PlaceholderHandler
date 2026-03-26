@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PlaceholderNode implements Comparable<PlaceholderNode> {
+public abstract class PlaceholderNode<C extends PlaceholderContext> implements Comparable<PlaceholderNode<?>> {
     private final int priority;
 
     public PlaceholderNode(int priority) {
@@ -20,26 +20,26 @@ public abstract class PlaceholderNode implements Comparable<PlaceholderNode> {
         return priority;
     }
 
-    public abstract boolean test(String parameter, PlaceholderContext context);
+    public abstract boolean test(String parameter, C context);
 
     @Override
     public int compareTo(@NotNull PlaceholderNode other) {
         return Integer.compare(this.priority, other.priority());
     }
 
-    public static List<PlaceholderNode> create(
+    public static <C extends PlaceholderContext> List<PlaceholderNode<C>> create(
         String path,
-        Map<String, PlaceholderParameter<?>> parameters
+        Map<String, PlaceholderParameter<?, C>> parameters
     ) {
         if (path.startsWith("%") && path.endsWith("%")) {
             path = path.substring(1, path.length() - 1);
         }
 
         return Arrays.stream(path.split("_"))
-            .map(parameter -> {
+            .<PlaceholderNode<C>>map(parameter -> {
                 if (parameter.startsWith("<") && parameter.endsWith(">")) {
                     String parameterName = parameter.substring(1, parameter.length() - 1);
-                    PlaceholderParameter<?> storedParameter = parameters.get(parameterName);
+                    PlaceholderParameter<?, C> storedParameter = parameters.get(parameterName);
                     if (storedParameter != null) {
                         return new ParameterNode<>(storedParameter.type(), parameterName, storedParameter.provider());
                     } else {
@@ -47,13 +47,13 @@ public abstract class PlaceholderNode implements Comparable<PlaceholderNode> {
                             .formatted(parameterName));
                     }
                 } else {
-                    return new LiteralNode(parameter);
+                    return new LiteralNode<>(parameter);
                 }
             })
             .toList();
     }
 
-    public static List<PlaceholderNode> create(String path) {
+    public static <C extends PlaceholderContext> List<PlaceholderNode<C>> create(String path) {
         return create(path, Collections.emptyMap());
     }
 }

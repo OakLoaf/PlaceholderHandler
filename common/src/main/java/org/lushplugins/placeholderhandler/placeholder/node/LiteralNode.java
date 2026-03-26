@@ -2,7 +2,7 @@ package org.lushplugins.placeholderhandler.placeholder.node;
 
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
 
-public class LiteralNode extends PlaceholderNode {
+public class LiteralNode<C extends PlaceholderContext> extends PlaceholderNode<C> {
     private final String name;
 
     public LiteralNode(String name) {

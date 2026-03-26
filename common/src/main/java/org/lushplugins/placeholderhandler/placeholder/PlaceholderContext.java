@@ -5,9 +5,9 @@ import org.lushplugins.placeholderhandler.stream.StringStream;
 
 public class PlaceholderContext {
     private final StringStream input;
-    private final PlaceholderHandler instance;
+    private final PlaceholderHandler<?> instance;
 
-    public PlaceholderContext(String input, PlaceholderHandler instance) {
+    public PlaceholderContext(String input, PlaceholderHandler<?> instance) {
         this.input = StringStream.create(input.substring(1, input.length() - 1));
         this.instance = instance;
     }
@@ -20,7 +20,11 @@ public class PlaceholderContext {
         return input;
     }
 
-    public PlaceholderHandler instance() {
+    public PlaceholderHandler<?> instance() {
         return instance;
+    }
+
+    public interface Constructor<C extends PlaceholderContext> {
+        C construct(String rawPlaceholder, PlaceholderHandler<C> instance);
     }
 }

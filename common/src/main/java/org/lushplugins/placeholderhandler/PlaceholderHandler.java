@@ -15,20 +15,23 @@ import org.lushplugins.placeholderhandler.stream.StringStream;
 
 import java.util.*;
 
-public final class PlaceholderHandler {
-    private final List<PlaceholderImpl> placeholders = new ArrayList<>();
-    private final Map<Class<?>, ParameterProvider.Factory> parameterProviders;
+public class PlaceholderHandler<C extends PlaceholderContext> {
+    private final List<PlaceholderImpl<C>> placeholders = new ArrayList<>();
+    private final PlaceholderContext.Constructor<C> contextConstructor;
+    private final Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders;
     private final HookRegistry hooks = new HookRegistry();
 
     public PlaceholderHandler(
-        Map<Class<?>, ParameterProvider.Factory> parameterProviders,
+        PlaceholderContext.Constructor<C> contextConstructor,
+        Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders,
         List<PlaceholderHook> hooks
     ) {
+        this.contextConstructor = contextConstructor;
         this.parameterProviders = parameterProviders;
         this.hooks.registerAll(hooks);
     }
 
-    public List<PlaceholderImpl> placeholders() {
+    public List<PlaceholderImpl<C>> placeholders() {
         return placeholders;
     }
 
@@ -40,31 +43,31 @@ public final class PlaceholderHandler {
                 return;
             }
 
-            List<PlaceholderImpl> placeholders = AnnotationHandler.register(instance.getClass(), instance, this);
+            List<PlaceholderImpl<C>> placeholders = AnnotationHandler.register(instance.getClass(), instance, this);
             this.placeholders.addAll(placeholders);
             this.hooks.registerPlaceholders(this, placeholders);
         }
     }
 
-    public void register(String rawPlaceholder, PlaceholderParser placeholder) {
-        List<PlaceholderNode> nodes = Arrays.stream(rawPlaceholder
+    public void register(String rawPlaceholder, PlaceholderParser<C> placeholder) {
+        List<PlaceholderNode<C>> nodes = Arrays.stream(rawPlaceholder
                 .substring(1, rawPlaceholder.length() - 1)
                 .split("_"))
-            .map(parameter -> (PlaceholderNode) new LiteralNode(parameter))
+            .<PlaceholderNode<C>>map(LiteralNode::new)
             .toList();
 
-        register(new PlaceholderImpl(nodes, placeholder));
+        register(new PlaceholderImpl<>(nodes, placeholder));
     }
 
     /**
      * @param context the placeholder context to parse
      * @return the result of the parsed input
      */
-    public @Nullable String parsePlaceholder(PlaceholderContext context) {
+    public @Nullable String parsePlaceholder(C context) {
         StringStream input = context.input();
         String identifier = input.peekUnquotedString();
 
-        for (PlaceholderImpl placeholder : this.placeholders) {
+        for (PlaceholderImpl<C> placeholder : this.placeholders) {
             if (!placeholder.firstNode().name().equals(identifier)) {
                 continue;
             }
@@ -82,10 +85,10 @@ public final class PlaceholderHandler {
      * @return the result of the parsed input
      */
     public @Nullable String parsePlaceholder(String rawPlaceholder) {
-        return parsePlaceholder(new PlaceholderContext(rawPlaceholder, this));
+        return parsePlaceholder(contextConstructor.construct(rawPlaceholder, this));
     }
 
-    public ParameterProvider.Factory getParameterProvider(Class<?> type) {
+    public ParameterProvider.Factory<C> getParameterProvider(Class<?> type) {
         return this.parameterProviders.get(type);
     }
 
@@ -93,40 +96,46 @@ public final class PlaceholderHandler {
         this.hooks.register(hook);
     }
 
-    public static Builder builder() {
-        return new Builder()
-            .registerParameterProviderFactory(String.class, new EmbeddedPlaceholderProvider())
-            .registerParameterProvider(String.class, (type, parameter, context) -> parameter);
+    public static <C extends PlaceholderContext> Builder<C> builder(PlaceholderContext.Constructor<C> contextConstructor) {
+        return new Builder<>(contextConstructor)
+            .registerGenericParameterProvider(String.class, (type, parameter, context) -> parameter)
+            .registerGenericParameterProviderFactory(String.class, new EmbeddedPlaceholderProvider<>());
     }
 
-    public static class Builder {
-        private final JavaPlugin plugin;
-        private final Map<Class<?>, ParameterProvider<?>> parameterProviders = new HashMap<>(Map.ofEntries(
-            ParameterProvider.forType(String.class, (type, parameter, context) -> parameter),
-            ParameterProvider.forType(Player.class, (type, parameter, context) -> context.player())
-        ));
-        private final Map<Class<?>, ParameterProvider.Factory> parameterProviderFactories = new HashMap<>(Map.ofEntries(
-            ParameterProvider.Factory.forType(String.class, new EmbeddedPlaceholderProvider())
-        ));
+    public static class Builder<C extends PlaceholderContext> {
+        private final PlaceholderContext.Constructor<C> contextConstructor;
+        private final Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders = new HashMap<>();
+        private final List<PlaceholderHook> hooks = new ArrayList<>();
 
-        private Builder() {}
+        private Builder(PlaceholderContext.Constructor<C> contextConstructor) {
+            this.contextConstructor = contextConstructor;
+        }
 
-        public <T> Builder registerParameterProviderFactory(Class<T> type, ParameterProvider.Factory provider) {
+        public <T> Builder<C> registerGenericParameterProviderFactory(Class<T> type, ParameterProvider.Factory<C> provider) {
             this.parameterProviders.put(type, provider);
             return this;
         }
 
-        public <T> Builder registerParameterProvider(Class<T> type, ParameterProvider<T> provider) {
+        public <T> Builder<C> registerGenericParameterProvider(Class<T> type, ParameterProvider<T, C> provider) {
+            return registerGenericParameterProviderFactory(type, ParameterProvider.Factory.of(provider));
+        }
+
+        public <T> Builder<C> registerParameterProviderFactory(Class<T> type, ParameterProvider.Factory<C> provider) {
+            this.parameterProviders.put(type, provider);
+            return this;
+        }
+
+        public <T> Builder<C> registerParameterProvider(Class<T> type, ParameterProvider<T, C> provider) {
             return registerParameterProviderFactory(type, ParameterProvider.Factory.of(provider));
         }
 
-        public Builder registerHook(PlaceholderHook hook) {
+        public Builder<C> registerHook(PlaceholderHook hook) {
             this.hooks.add(hook);
             return this;
         }
 
-        public PlaceholderHandler build() {
-            return new PlaceholderHandler(this.parameterProviders, this.hooks);
+        public PlaceholderHandler<?> build() {
+            return new PlaceholderHandler<>(this.contextConstructor, this.parameterProviders, this.hooks);
         }
     }
 }

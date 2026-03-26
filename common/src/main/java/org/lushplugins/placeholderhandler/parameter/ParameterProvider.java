@@ -5,14 +5,14 @@ import org.lushplugins.placeholderhandler.annotation.AnnotationList;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
 
 @FunctionalInterface
-public interface ParameterProvider<T> {
-    T collect(Class<T> typeClass, String parameter, PlaceholderContext context);
+public interface ParameterProvider<T, C extends PlaceholderContext> {
+    T collect(Class<T> typeClass, String parameter, C context);
 
     @FunctionalInterface
-    interface Factory {
-        ParameterProvider<?> create(Class<?> type, AnnotationList annotations, PlaceholderHandler instance);
+    interface Factory<C extends PlaceholderContext> {
+        ParameterProvider<?, C> create(Class<?> type, AnnotationList annotations, PlaceholderHandler<C> instance);
 
-        static ParameterProvider.Factory of(ParameterProvider<?> provider) {
+        static <C extends PlaceholderContext> ParameterProvider.Factory<C> of(ParameterProvider<?, C> provider) {
             return (type, annotations, instance) -> provider;
         }
     }

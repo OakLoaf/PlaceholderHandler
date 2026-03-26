@@ -10,7 +10,7 @@ import org.lushplugins.placeholderhandler.placeholder.PlaceholderImpl;
 
 import java.util.*;
 
-public class PlaceholderAPIHook implements PlaceholderHook {
+public class PlaceholderAPIHook implements PlaceholderHook<BukkitPlaceholderContext> {
     private final JavaPlugin plugin;
     private final Map<String, Expansion> expansions = new HashMap<>();
 
@@ -19,7 +19,7 @@ public class PlaceholderAPIHook implements PlaceholderHook {
     }
 
     @Override
-    public void register(PlaceholderHandler instance, Collection<PlaceholderImpl> placeholders) {
+    public void register(PlaceholderHandler<BukkitPlaceholderContext> instance, Collection<PlaceholderImpl<BukkitPlaceholderContext>> placeholders) {
         placeholders.stream()
             .map(placeholder -> placeholder.firstNode().name())
             .distinct()
@@ -32,11 +32,11 @@ public class PlaceholderAPIHook implements PlaceholderHook {
     }
 
     public static class Expansion extends PlaceholderExpansion {
-        private final PlaceholderHandler instance;
+        private final PlaceholderHandler<BukkitPlaceholderContext> instance;
         private final JavaPlugin plugin;
         private final String identifier;
 
-        public Expansion(PlaceholderHandler instance, JavaPlugin plugin, String identifier) {
+        public Expansion(PlaceholderHandler<BukkitPlaceholderContext> instance, JavaPlugin plugin, String identifier) {
             this.instance = instance;
             this.plugin = plugin;
             this.identifier = identifier;
@@ -44,7 +44,7 @@ public class PlaceholderAPIHook implements PlaceholderHook {
 
         public String onPlaceholderRequest(Player player, @NotNull String params) {
             String placeholder = "%" + identifier + "_" + params + "%";
-            return this.instance.parsePlaceholder(new BukkitPlaceholderContext(placeholder, player, this.instance));
+            return this.instance.parsePlaceholder(new BukkitPlaceholderContext(placeholder, this.instance, player));
         }
 
         public boolean persist() {

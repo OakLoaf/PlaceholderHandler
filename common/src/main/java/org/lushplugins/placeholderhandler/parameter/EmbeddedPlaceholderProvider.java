@@ -5,17 +5,17 @@ import org.lushplugins.placeholderhandler.annotation.AnnotationList;
 import org.lushplugins.placeholderhandler.annotation.EmbeddedPlaceholder;
 import org.lushplugins.placeholderhandler.placeholder.PlaceholderContext;
 
-public class EmbeddedPlaceholderProvider implements ParameterProvider.Factory {
+public class EmbeddedPlaceholderProvider<C extends PlaceholderContext> implements ParameterProvider.Factory<C> {
 
     @Override
-    public ParameterProvider<?> create(Class<?> type, AnnotationList annotations, PlaceholderHandler instance) {
-        return annotations.contains(EmbeddedPlaceholder.class) ? new Provider() : null;
+    public ParameterProvider<?, C> create(Class<?> type, AnnotationList annotations, PlaceholderHandler<C> instance) {
+        return annotations.contains(EmbeddedPlaceholder.class) ? new Provider<>() : null;
     }
 
-    public static class Provider implements ParameterProvider<String> {
+    public static class Provider<C extends PlaceholderContext> implements ParameterProvider<String, C> {
 
         @Override
-        public String collect(Class<String> typeClass, String parameter, PlaceholderContext context) {
+        public String collect(Class<String> typeClass, String parameter, C context) {
             return context.instance().parsePlaceholder(parameter);
         }
     }

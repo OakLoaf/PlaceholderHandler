@@ -6,29 +6,29 @@ import org.lushplugins.placeholderhandler.stream.MutableStringStream;
 
 import java.util.List;
 
-public class PlaceholderImpl {
-    private final List<PlaceholderNode> nodes;
-    private final PlaceholderParser parser;
+public class PlaceholderImpl<C extends PlaceholderContext> {
+    private final List<PlaceholderNode<C>> nodes;
+    private final PlaceholderParser<C> parser;
 
-    public PlaceholderImpl(List<PlaceholderNode> nodes, PlaceholderParser parser) {
+    public PlaceholderImpl(List<PlaceholderNode<C>> nodes, PlaceholderParser<C> parser) {
         this.nodes = nodes;
         this.parser = parser;
     }
 
-    public LiteralNode firstNode() {
-        return (LiteralNode) nodes.getFirst();
+    public LiteralNode<C> firstNode() {
+        return (LiteralNode<C>) nodes.getFirst();
     }
 
-    public List<PlaceholderNode> nodes() {
+    public List<PlaceholderNode<C>> nodes() {
         return nodes;
     }
 
-    public String parse(MutableStringStream input, PlaceholderContext context) {
+    public String parse(MutableStringStream input, C context) {
         return this.parser.parse(input, this, context);
     }
 
-    public boolean isValid(MutableStringStream input, PlaceholderContext context) {
-        for (PlaceholderNode node : this.nodes) {
+    public boolean isValid(MutableStringStream input, C context) {
+        for (PlaceholderNode<C> node : this.nodes) {
             String parameter = input.readString();
             if (!node.test(parameter, context)) {
                 return false;

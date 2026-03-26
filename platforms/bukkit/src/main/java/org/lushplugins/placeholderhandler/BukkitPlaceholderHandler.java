@@ -7,9 +7,9 @@ import org.lushplugins.placeholderhandler.hook.PlaceholderAPIHook;
 
 public class BukkitPlaceholderHandler {
 
-    public static PlaceholderHandler.Builder builder(JavaPlugin plugin) {
-        return PlaceholderHandler.builder()
-            .registerParameterProvider(Player.class, (type, parameter, context) -> ((BukkitPlaceholderContext) context).player())
+    public static PlaceholderHandler.Builder<BukkitPlaceholderContext> builder(JavaPlugin plugin) {
+        return PlaceholderHandler.builder(BukkitPlaceholderContext.constructor())
+            .registerParameterProvider(Player.class, (type, parameter, context) -> context.player())
             .registerHook(new PlaceholderAPIHook(plugin));
     }
 }
