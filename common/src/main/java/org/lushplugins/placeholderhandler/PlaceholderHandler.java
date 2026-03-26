@@ -19,12 +19,12 @@ public class PlaceholderHandler<C extends PlaceholderContext> {
     private final List<PlaceholderImpl<C>> placeholders = new ArrayList<>();
     private final PlaceholderContext.Constructor<C> contextConstructor;
     private final Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders;
-    private final HookRegistry hooks = new HookRegistry();
+    private final HookRegistry<C> hooks = new HookRegistry<>();
 
     public PlaceholderHandler(
         PlaceholderContext.Constructor<C> contextConstructor,
         Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders,
-        List<PlaceholderHook> hooks
+        List<PlaceholderHook<C>> hooks
     ) {
         this.contextConstructor = contextConstructor;
         this.parameterProviders = parameterProviders;
@@ -92,7 +92,7 @@ public class PlaceholderHandler<C extends PlaceholderContext> {
         return this.parameterProviders.get(type);
     }
 
-    public void registerHook(PlaceholderHook hook) {
+    public void registerHook(PlaceholderHook<C> hook) {
         this.hooks.register(hook);
     }
 
@@ -105,7 +105,7 @@ public class PlaceholderHandler<C extends PlaceholderContext> {
     public static class Builder<C extends PlaceholderContext> {
         private final PlaceholderContext.Constructor<C> contextConstructor;
         private final Map<Class<?>, ParameterProvider.Factory<C>> parameterProviders = new HashMap<>();
-        private final List<PlaceholderHook> hooks = new ArrayList<>();
+        private final List<PlaceholderHook<C>> hooks = new ArrayList<>();
 
         private Builder(PlaceholderContext.Constructor<C> contextConstructor) {
             this.contextConstructor = contextConstructor;
@@ -129,7 +129,7 @@ public class PlaceholderHandler<C extends PlaceholderContext> {
             return registerParameterProviderFactory(type, ParameterProvider.Factory.of(provider));
         }
 
-        public Builder<C> registerHook(PlaceholderHook hook) {
+        public Builder<C> registerHook(PlaceholderHook<C> hook) {
             this.hooks.add(hook);
             return this;
         }

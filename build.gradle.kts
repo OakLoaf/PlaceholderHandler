@@ -1,12 +1,11 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("com.gradleup.shadow") version("8.3.0")
+    id("com.gradleup.shadow") version("9.3.1")
 }
 
 allprojects {
     apply(plugin = "java-library")
-    apply(plugin = "com.gradleup.shadow")
 
     group = "org.lushplugins"
     version = "1.0.0-alpha11"
@@ -22,16 +21,6 @@ allprojects {
     tasks {
         withType<JavaCompile> {
             options.encoding = "UTF-8"
-        }
-
-        build {
-            dependsOn(shadowJar)
-        }
-
-        shadowJar {
-            minimize()
-
-            archiveFileName.set("${project.name}-${project.version}.jar")
         }
     }
 }

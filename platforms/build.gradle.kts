@@ -1,4 +1,6 @@
 subprojects {
+    apply(plugin = "com.gradleup.shadow")
+
     publishing {
         publications {
             create<MavenPublication>("maven") {
