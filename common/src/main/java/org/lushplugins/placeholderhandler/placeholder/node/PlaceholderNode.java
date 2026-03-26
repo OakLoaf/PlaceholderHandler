@@ -41,7 +41,7 @@ public abstract class PlaceholderNode implements Comparable<PlaceholderNode> {
                     String parameterName = parameter.substring(1, parameter.length() - 1);
                     PlaceholderParameter<?> storedParameter = parameters.get(parameterName);
                     if (storedParameter != null) {
-                        return new ParameterNode<>(storedParameter.type(), storedParameter.provider());
+                        return new ParameterNode<>(storedParameter.type(), parameterName, storedParameter.provider());
                     } else {
                         throw new IllegalArgumentException("Could not find a parameter with name '%s'"
                             .formatted(parameterName));

@@ -24,7 +24,7 @@ public class PlaceholderImpl {
     }
 
     public String parse(MutableStringStream input, PlaceholderContext context) {
-        return this.parser.parse(input, context);
+        return this.parser.parse(input, this, context);
     }
 
     public boolean isValid(MutableStringStream input, PlaceholderContext context) {
