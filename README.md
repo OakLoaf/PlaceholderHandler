@@ -6,7 +6,7 @@ Much of PlaceholderHandler's structure is based on the [Revxrsal/Lamp](https://g
 In the long-term, PlaceholderHandler aims to be platform independent meaning it will be able to support handling placeholders for any Java application, not just Bukkit based software.
 
 ## Dependency Information
-![Version Number](https://repo.lushplugins.org/api/badge/latest/releases/org/lushplugins/PlaceholderHandler?color=40c14a&name=Latest)
+![Version Number](https://repo.lushplugins.org/api/badge/latest/releases/org/lushplugins/placeholderhandler-common?color=40c14a&name=Latest)
 
 <details open>
 <summary>Maven</summary>
@@ -25,7 +25,7 @@ In the long-term, PlaceholderHandler aims to be platform independent meaning it 
 <dependencies>
     <dependency>
         <groupId>org.lushplugins</groupId>
-        <artifactId>PlaceholderHandler</artifactId>
+        <artifactId>placeholderhandler-bukkit</artifactId>
         <version>1.0.0</version>
     </dependency>
 </dependencies>
@@ -45,7 +45,7 @@ repositories {
 **Artifact:**
 ```gradle
 dependencies {
-    compileOnly "org.lushplugins.pluginupdater:PlaceholderHandler:1.0.0"
+    compileOnly "org.lushplugins:placeholderhandler-bukkit:1.0.0"
 }
 ```
 </details>
@@ -65,12 +65,12 @@ public class ExamplePlaceholders {
         return player != null ? player.getUniqueId().toString() : null;
     }
 
-    @SubPlaceholder("<rawString>_upper_case") // Will register as "%example_<rawString>_upper_case%, where `<rawString>` is passed as the parameter in the method"
+    @SubPlaceholder("<rawString>_upper_case") // Will register as "%example_<rawString>_upper_case%", where `<rawString>` is passed as the parameter in the method
     public void name(String rawString) {
         return rawString.toUpperCase();
     }
 
-    @Placeholder("different_hello") // Will register as "%different_hello%"
+    @Placeholder("alternate_hello") // Will register as "%alternate_hello%"
     public String hello() {
         return "Hello World!";
     }
@@ -78,17 +78,20 @@ public class ExamplePlaceholders {
 ```
 
 ## Registering Placeholders
-Registering your placeholders is very simple, simply create a PlaceholderHandler instance, and register your placeholders as an object.
+Registering your placeholders is very simple, simply create a PlaceholderHandler instance, and register your placeholders as an object. 
+*The below snippet uses BukkitPlaceholderHandler as an example*
 ```java
-PlaceholderHandler placeholderHandler = PlaceholderHandler.builder(plugin).build();
-placeholderHandler.register(new ExamplePlaceholders());
+BukkitPlaceholderHandler.builder(plugin)
+    .build();
+    .register(new ExamplePlaceholders());
 ```
 
 ## Adding Parameter Providers
 Creating a simple parameter provider for a class is very easy and can be done inline or by creating a class that implements `ParameterProvider`.
 You can also use `ParameterProvider.Factory` which allows for much more specific implementations including parsing based on custom annotations.
+*The below snippet uses BukkitPlaceholderHandler as an example*
 ```java
-PlaceholderHandler.builder(this)
+BukkitPlaceholderHandler.builder(plugin)
     .registerParameterProvider(UUID.class, (type, parameter, context) -> {
         Player player = context.player();
         return player != null ? player.getUniqueId() : null;
