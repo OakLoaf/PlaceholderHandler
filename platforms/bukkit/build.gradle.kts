@@ -10,16 +10,3 @@ dependencies {
     // Soft Dependencies
     compileOnly("me.clip:placeholderapi:2.11.5")
 }
-
-tasks {
-    processResources{
-        filesMatching("plugin.yml") {
-            expand(project.properties)
-        }
-
-        inputs.property("version", rootProject.version)
-        filesMatching("plugin.yml") {
-            expand("version" to rootProject.version)
-        }
-    }
-}
