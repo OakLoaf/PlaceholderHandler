@@ -8,7 +8,7 @@ allprojects {
     apply(plugin = "java-library")
 
     group = "org.lushplugins"
-    version = "1.0.0-alpha11"
+    version = "1.0.0-alpha12"
 
     repositories {
         mavenLocal()

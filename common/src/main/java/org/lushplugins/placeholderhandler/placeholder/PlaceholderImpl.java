@@ -35,6 +35,6 @@ public class PlaceholderImpl<C extends PlaceholderContext> {
             }
         }
 
-        return true;
+        return input.hasFinished();
     }
 }
