@@ -56,17 +56,17 @@ dependencies {
 public class ExamplePlaceholders {
 
     @SubPlaceholder("uuid") // Will register as "%example_uuid%"
-    public void uniqueId(@Nullable Player player) {
+    public String uniqueId(@Nullable Player player) {
         return player != null ? player.getUniqueId().toString() : null;
     }
 
     @SubPlaceholder("name") // Will register as "%example_name%"
-    public void name(@Nullable Player player) {
+    public String name(@Nullable Player player) {
         return player != null ? player.getUniqueId().toString() : null;
     }
 
     @SubPlaceholder("<rawString>_upper_case") // Will register as "%example_<rawString>_upper_case%", where `<rawString>` is passed as the parameter in the method
-    public void name(String rawString) {
+    public String name(String rawString) {
         return rawString.toUpperCase();
     }
 
