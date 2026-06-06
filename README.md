@@ -1,5 +1,5 @@
 # PlaceholderHandler
-PkaceholderHandler is an annotation-based placeholder handler, the goal of the project is to make an abstract placeholder implementation that could be applied to many different projects with ease. 
+PlaceholderHandler is an annotation-based placeholder handler, the goal of the project is to make an abstract placeholder implementation that could be applied to many different projects with ease. 
 Much of PlaceholderHandler's structure is based on the [Revxrsal/Lamp](https://github.com/Revxrsal/Lamp) command library.
 
 ## Goals
